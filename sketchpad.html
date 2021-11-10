@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+	<head>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <title>Sketchpad</title>
+	  <meta name="author" content="Rohan Kanchana">
+	</head>
+	<body>
+		<canvas id="sketchpad" >
+		<script>
+			// Maintain state of key presses
+			const mode = {write: false, dashed: false, erase: false, clear: false};
+			const k2M = {w: 'write', q: 'dashed', e: 'erase', c: 'clear'};  // Key to mode key
+			document.onkeydown = ({key}) => k2M.hasOwnProperty(key) && (mode[k2M[key]] = true);
+			document.onkeyup = ({key}) => k2M.hasOwnProperty(key) && (mode[k2M[key]] = false);
+
+			// Handle drawing on canvas
+			const sketchpad = document.getElementById('sketchpad');
+			const context = sketchpad.getContext('2d');
+
+			// Set canvas dimensions to those of window
+			context.canvas.width = window.innerWidth;
+			context.canvas.height = window.innerHeight;
+
+			function euclideanDistance(pointA, pointB) {
+				const yDistanceSquared = Math.pow(pointB.y - pointA.y, 2);
+				const xDistanceSquared = Math.pow(pointB.x - pointA.x, 2);
+				return Math.sqrt(yDistanceSquared + xDistanceSquared);
+			}
+
+			function interpolateFill(pointA, pointB, intervalLength, size) {
+				const numPoints = euclideanDistance(pointA, pointB) / intervalLength;
+				const yStep = (pointB.y - pointA.y) / numPoints;
+				const xStep = (pointB.x - pointA.x) / numPoints;
+				for (let i = 0; i < numPoints; i++) {
+					const intermediateX = (pointA.x + i*xStep) - size/2;
+					const intermediateY = (pointA.y + i*yStep) - size/2;
+					context.fillRect(intermediateX, intermediateY, size, size);
+				}
+			}
+
+			const size = 5;
+			let lastPoint = {x: undefined, y: undefined};
+			sketchpad.addEventListener('mousemove', ({offsetX: x, offsetY: y}) => {
+				let currentPoint = {x, y};
+				if (mode.write) {
+					context.fillStyle = 'black';
+					interpolateFill(lastPoint, currentPoint, 1, 5);
+				} else if (mode.erase || mode.clear) {
+					context.fillStyle = 'white';
+					interpolateFill(lastPoint, currentPoint, 1, mode.erase ? 20 : 200);
+				} else if (mode.dashed) {
+					context.fillStyle = 'black';
+					interpolateFill(lastPoint, currentPoint, 100, 5);
+				}
+				lastPoint = currentPoint;
+			});
+		</script>
+	</body>
+</html>
+
