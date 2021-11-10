@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 	<head>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <title>Sketchpad</title>
-	  <meta name="author" content="Rohan Kanchana">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Sketchpad</title>
+		<meta name="author" content="Rohan Kanchana">
 	</head>
 	<body>
 		<canvas id="sketchpad" >
@@ -40,7 +40,6 @@
 				}
 			}
 
-			const size = 5;
 			let lastPoint = {x: undefined, y: undefined};
 			sketchpad.addEventListener('mousemove', ({offsetX: x, offsetY: y}) => {
 				let currentPoint = {x, y};
